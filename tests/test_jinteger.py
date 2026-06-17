@@ -1,3 +1,5 @@
+import pytest
+
 from javalang.jinteger import JInteger
 
 def test_constants_integer():
@@ -76,3 +78,37 @@ def test_hash_code_and_equality():
     import pytest
     with pytest.raises(TypeError):
         jint1.compareTo(123)
+
+def test_static_parsing_methods():
+    # Testando parseInt
+    assert JInteger.parseInt("123") == 123
+    assert JInteger.parseInt("1010", 2) == 10
+    assert JInteger.parseInt("FF", 16) == 255
+    with pytest.raises(ValueError):
+        JInteger.parseInt("abc")  # Base 10 padrão não aceita letras
+
+    # Testando parseUnsignedInt
+    assert JInteger.parseUnsignedInt("4294967295") == 4294967295
+    assert JInteger.parseUnsignedInt("10", 16) == 16
+    with pytest.raises(ValueError):
+        JInteger.parseUnsignedInt("-1") # Deve falhar (unsigned)
+    with pytest.raises(ValueError):
+        JInteger.parseUnsignedInt("5000000000") # Excede 32 bits
+
+    # Testando valueOf (Fábrica)
+    j1 = JInteger.valueOf(100)
+    assert isinstance(j1, JInteger)
+    assert j1.value == 100
+
+    j2 = JInteger.valueOf("200", 10)
+    assert j2.value == 200
+
+    j3 = JInteger.valueOf("10", 2)
+    assert j3.value == 2
+
+    # Testando decode
+    assert JInteger.decode("0xAF").value == 175
+    # O int(nm, 0) do Python precisa de ajuste para #
+    assert JInteger.decode("#AF").value == 175
+    # Octal (012 em octal é 10)
+    assert JInteger.decode("012").value == 10
