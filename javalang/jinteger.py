@@ -124,3 +124,25 @@ class JInteger:
             return JInteger(int(nm, 8))
 
         return JInteger(int(nm, 0))
+
+    #Formatação por Base
+    @staticmethod
+    def toString(i: int, radix: int = 10) -> str:
+        """Retorna a representação string de um inteiro i na base especificada."""
+        if radix < 2 or radix > 36:
+            raise ValueError("Radix must be between 2 and 36")
+        if i < 0:
+            return '-' + JInteger.toString(-i, radix)
+        digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+        result = ""
+        while i >= radix:
+            result = digits[i % radix] + result
+            i //= radix
+        return digits[i] + result
+    
+    @staticmethod
+    def toUnsignedString(i: int, radix: int = 10) -> str:
+        """Retorna a representação string de um inteiro tratado como unsigned."""
+        if i < 0:
+            i += 1 << 32  # Tratar como unsigned
+        return JInteger.toString(i, radix)
