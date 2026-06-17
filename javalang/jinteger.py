@@ -77,3 +77,50 @@ class JInteger:
         if not isinstance(other, JInteger):
             raise TypeError("Can only compare with another JInteger")
         return (self.value > other.value) - (self.value < other.value)
+
+    #implementar métodos estáticos de análise e fábricas (parseInt, valueOf, decode)
+    @staticmethod
+    def parseInt(s: str, radix: int = 10) -> int:
+        """Implementação unificada de parseInt(s) e parseInt(s, radix)."""
+        try:
+            return int(s, radix)
+        except ValueError as e:
+            raise ValueError(f"Invalid string for parseInt: '{s}'") from e
+
+
+    @staticmethod
+    def parseUnsignedInt(s: str, radix: int = 10) -> int:
+        """
+        Implementação unificada de parseUnsignedInt(s) e
+        parseUnsignedInt(s, radix).
+        """
+        value = int(s, radix)
+        if value < 0 or value > 4294967295:
+            raise ValueError(f"Value out of range for unsigned 32-bit int: '{s}'")
+        return value
+
+
+    @staticmethod
+    def valueOf(val, radix: int = 10) -> 'JInteger':
+        """Fábrica para criar JInteger a partir de int ou str."""
+        if isinstance(val, int):
+            return JInteger(val)
+        return JInteger(int(val, radix))
+
+    @staticmethod
+    def decode(nm: str) -> 'JInteger':
+        """Interpreta prefixos 0x, 0X, # e 0 (octal) conforme especificação Java."""
+        if not nm:
+            raise ValueError("String is empty")
+        # Trata o prefixo # para hexadecimal
+        if nm.startswith('#'):
+            return JInteger(int(nm[1:], 16))
+
+        if (
+            nm.startswith('0') and len(nm) > 1 and
+            not nm.lower().startswith(('0x', '0b'))
+        ):
+            # Se for '012', tratamos como octal (base 8)
+            return JInteger(int(nm, 8))
+
+        return JInteger(int(nm, 0))
