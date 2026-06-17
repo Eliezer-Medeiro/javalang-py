@@ -58,3 +58,10 @@ Este documento regista formalmente as decisões de engenharia de software adotad
     1. `obj.toString()`: Retorna a string do valor da instância.
     2. `JInteger.toString(i, radix)`: Executa a conversão lógica baseada na especificação estática do Java.
 * **Justificativa:** Esta abordagem preserva a integridade dos nomes exigidos pela especificação, evita a criação de métodos com nomes não oficiais e respeita a limitação técnica do interpretador Python, mantendo a compatibilidade funcional com o contrato Java original.
+
+---
+
+## 6. Implementação de Operações Bit a Bit (Issue #10)
+* **Conformidade:** Implementados todos os 10 métodos conforme a API estática do Java `java.lang.Integer`.
+* **Tratamento de bits:** Dada a natureza de precisão arbitrária do `int` em Python, todos os métodos utilizam a máscara `& 0xFFFFFFFF` para emular o registo de 32 bits da JVM.
+* **Complemento de Dois:** Criado o método auxiliar `_to_signed_32` para garantir que o bit de sinal seja preservado em operações de rotação e inversão, mantendo a paridade com o comportamento de números negativos do Java.

@@ -178,3 +178,67 @@ class JInteger:
         if i < 0:
             i += 1 << 32
         return JInteger.toString(i, radix)
+
+    # Métodos adicionais para manipulação de bits, como bitCount e highestOneBit
+    @staticmethod
+    def _to_signed_32(n: int) -> int:
+        n &= 0xFFFFFFFF
+        return n - 0x100000000 if n & 0x80000000 else n
+
+    @staticmethod
+    def bitCount(i: int) -> int:
+        return bin(i & 0xFFFFFFFF).count('1')
+
+    @staticmethod
+    def highestOneBit(i: int) -> int:
+        i &= 0xFFFFFFFF
+        if i == 0:
+            return 0
+        return JInteger._to_signed_32(1 << (i.bit_length() - 1))
+
+    # Metodo lowestOneBit e numberOfLeadingZeros e numberOfTrailingZeros
+    @staticmethod
+    def lowestOneBit(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return JInteger._to_signed_32(i & (~i + 1))
+
+    @staticmethod
+    def numberOfLeadingZeros(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return 32 - i.bit_length() if i != 0 else 32
+
+    @staticmethod
+    def numberOfTrailingZeros(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return (i & (~i + 1)).bit_length() - 1 if i != 0 else 32
+
+    # Métodos adicionais para manipulação de bits, como reverse e rotateLeft
+    @staticmethod
+    def reverse(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return JInteger._to_signed_32(int(f"{i:032b}"[::-1], 2))
+
+    @staticmethod
+    def reverseBytes(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return JInteger._to_signed_32(((i >> 24) & 0xFF) | ((i >> 8) & 0xFF00) |
+                                      ((i << 8) & 0xFF0000) | ((i << 24) & 0xFF000000))
+
+    @staticmethod
+    def rotateLeft(i: int, distance: int) -> int:
+        i &= 0xFFFFFFFF
+        dist = distance & 31
+        res = ((i << dist) | (i >> (32 - dist))) & 0xFFFFFFFF
+        return JInteger._to_signed_32(res)
+
+    @staticmethod
+    def rotateRight(i: int, distance: int) -> int:
+        i &= 0xFFFFFFFF  # Trata como 32 bits unsigned
+        dist = distance & 31
+        # Rotaciona como unsigned e aplica a máscara
+        res = ((i >> dist) | (i << (32 - dist))) & 0xFFFFFFFF
+        return JInteger._to_signed_32(res)
+
+    @staticmethod
+    def signum(i: int) -> int:
+        return 1 if i > 0 else (-1 if i < 0 else 0)

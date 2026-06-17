@@ -126,3 +126,40 @@ def test_formatting_methods():
 
     # Teste Unsigned
     assert JInteger.toUnsignedString(-1) == "4294967295"
+
+def test_bit_counting():
+    # 0x0000000F = 15 (4 bits um)
+    assert JInteger.bitCount(15) == 4
+    # -1 em 32 bits é 0xFFFFFFFF (32 bits um)
+    assert JInteger.bitCount(-1) == 32
+
+def test_highest_lowest_one_bit():
+    # 10 é 1010 em binário. Highest: 8 (1000), Lowest: 2 (0010)
+    assert JInteger.highestOneBit(10) == 8
+    assert JInteger.lowestOneBit(10) == 2
+    assert JInteger.highestOneBit(0) == 0
+
+def test_zeros_counting():
+    # 1 (0...01). Liderança: 31 zeros, Trilha: 0 zeros
+    assert JInteger.numberOfLeadingZeros(1) == 31
+    assert JInteger.numberOfTrailingZeros(1) == 0
+    # 0 tem 32 zeros de ambos os lados
+    assert JInteger.numberOfLeadingZeros(0) == 32
+    assert JInteger.numberOfTrailingZeros(0) == 32
+
+def test_reversal():
+    # Reverter 1 (000...001) vira 0x80000000 (-2147483648 em signed 32)
+    assert JInteger.reverse(1) == -2147483648
+    # Reverter bytes de 0x12345678 -> 0x78563412
+    assert JInteger.reverseBytes(0x12345678) == 0x78563412
+
+def test_rotation():
+    # Rotação de 32 bits: 1 rodado 1 para esquerda vira 2
+    assert JInteger.rotateLeft(1, 1) == 2
+    # Rotação de 32 bits: 0x80000000 (-2147483648) rodado 1 para direita vira 1073741824
+    assert JInteger.rotateRight(-2147483648, 1) == 1073741824
+
+def test_signum():
+    assert JInteger.signum(100) == 1
+    assert JInteger.signum(-100) == -1
+    assert JInteger.signum(0) == 0
