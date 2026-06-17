@@ -194,3 +194,19 @@ class JInteger:
         i &= 0xFFFFFFFF
         if i == 0: return 0
         return JInteger._to_signed_32(1 << (i.bit_length() - 1))
+    
+    # Metodo lowestOneBit e numberOfLeadingZeros e numberOfTrailingZeros
+    @staticmethod
+    def lowestOneBit(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return JInteger._to_signed_32(i & (~i + 1))
+
+    @staticmethod
+    def numberOfLeadingZeros(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return 32 - i.bit_length() if i != 0 else 32
+
+    @staticmethod
+    def numberOfTrailingZeros(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return (i & (~i + 1)).bit_length() - 1 if i != 0 else 32
