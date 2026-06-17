@@ -21,3 +21,19 @@ class JInteger:
         else:
             self.value = int(value)
 
+    def byteValue(self) -> int:
+        """Retorna o valor do JInteger como um byte (8 bits)"""
+        return (self.value + 128) % 256 - 128
+
+    def shortValue(self) -> int:
+        """Retorna o valor do JInteger como um short (16 bits)"""
+        return (self.value + 32768) % 65536 - 32768
+
+    def intValue(self) -> int:
+        """Retorna o valor do JInteger como um int (32 bits)"""
+        return self.value
+
+    def longValue(self) -> int:
+        """Retorna o valor do JInteger como um long (64 bits)"""
+        return self.value
+

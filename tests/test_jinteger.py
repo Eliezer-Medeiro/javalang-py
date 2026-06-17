@@ -22,3 +22,19 @@ def test_constructor_integer():
         assert False, "Expected ValueError for invalid string"
     except ValueError as e:
         assert str(e) == "Invalid string for JInteger: 'abc'"
+
+def test_value_methods_integer():
+    jint = JInteger(300)
+
+    # Testando byteValue
+    assert jint.byteValue() == 44  # 300 mod 256 = 44
+
+    # Testando shortValue
+    assert jint.shortValue() == 300  # 300 fits in a short
+
+    # Testando intValue
+    assert jint.intValue() == 300
+
+    # Testando longValue
+    assert jint.longValue() == 300
+
