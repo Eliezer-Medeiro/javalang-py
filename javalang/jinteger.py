@@ -242,3 +242,52 @@ class JInteger:
     @staticmethod
     def signum(i: int) -> int:
         return 1 if i > 0 else (-1 if i < 0 else 0)
+
+    # Aritmetica estatica
+    @staticmethod
+    def sum(a: int, b: int) -> int:
+        """Retorna a soma de dois inteiros simulando overflow de 32 bits."""
+        return JInteger._to_signed_32(a + b)
+
+    @staticmethod
+    def max(a: int, b: int) -> int:
+        return JInteger._to_signed_32(a if a > b else b)
+
+    @staticmethod
+    def min(a: int, b: int) -> int:
+        return a if a < b else b
+
+    @staticmethod
+    def compare(a: int, b: int) -> int:
+        """Compara dois inteiros com sinal.
+
+        Retorna 0 se iguais, 1 se a > b, -1 se a < b.
+        """
+        return (a > b) - (a < b)
+
+    @staticmethod
+    def compareUnsigned(a: int, b: int) -> int:
+        """Compara dois inteiros tratando-os como 32 bits sem sinal."""
+        a_unsigned = a & 0xFFFFFFFF
+        b_unsigned = b & 0xFFFFFFFF
+        return (a_unsigned > b_unsigned) - (a_unsigned < b_unsigned)
+
+    @staticmethod
+    def divideUnsigned(dividend: int, divisor: int) -> int:
+        """Divide dois inteiros tratando-os como 32 bits sem sinal."""
+        if divisor == 0:
+            raise ZeroDivisionError("division by zero")
+        dividend_unsigned = dividend & 0xFFFFFFFF
+        divisor_unsigned = divisor & 0xFFFFFFFF
+        res = dividend_unsigned // divisor_unsigned
+        return JInteger._to_signed_32(res)
+
+    @staticmethod
+    def remainderUnsigned(dividend: int, divisor: int) -> int:
+        """Calcula o resto da divisão tratando os valores como 32 bits sem sinal."""
+        if divisor == 0:
+            raise ZeroDivisionError("division by zero")
+        dividend_unsigned = dividend & 0xFFFFFFFF
+        divisor_unsigned = divisor & 0xFFFFFFFF
+        res = dividend_unsigned % divisor_unsigned
+        return JInteger._to_signed_32(res)

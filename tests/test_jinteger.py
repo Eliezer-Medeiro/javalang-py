@@ -163,3 +163,38 @@ def test_signum():
     assert JInteger.signum(100) == 1
     assert JInteger.signum(-100) == -1
     assert JInteger.signum(0) == 0
+
+def test_static_arithmetic():
+    # Teste normal de soma
+    assert JInteger.sum(10, 20) == 30
+
+    # Teste crítico de Overflow do Java (Integer.MAX_VALUE + 1)
+    # 2147483647 + 1 deve virar -2147483648
+    assert JInteger.sum(2147483647, 1) == -2147483648
+
+    # Testes de max e min
+    assert JInteger.max(10, 20) == 20
+    assert JInteger.max(-5, -10) == -5
+    assert JInteger.min(10, 20) == 10
+    assert JInteger.min(-5, -10) == -10
+
+def test_unsigned_math_and_compare():
+    # compare: normal vs com sinal
+    # Em compare normal, -1 < 1 -> retorna -1
+    assert JInteger.compare(-1, 1) == -1
+    # Em compareUnsigned, -1 vira 4294967295, logo -1 > 1 -> retorna 1
+    assert JInteger.compareUnsigned(-1, 1) == 1
+    assert JInteger.compareUnsigned(5, 5) == 0
+
+    # divideUnsigned: -1 (4294967295) // 2 = 2147483647
+    assert JInteger.divideUnsigned(-1, 2) == 2147483647
+
+    # remainderUnsigned: -1 (4294967295) % 10 = 5
+    assert JInteger.remainderUnsigned(-1, 10) == 5
+
+    # Teste de Exceção (Lançar ZeroDivisionError)
+    with pytest.raises(ZeroDivisionError):
+        JInteger.divideUnsigned(10, 0)
+
+    with pytest.raises(ZeroDivisionError):
+        JInteger.remainderUnsigned(10, 0)
