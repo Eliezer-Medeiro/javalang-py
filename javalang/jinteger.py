@@ -178,3 +178,19 @@ class JInteger:
         if i < 0:
             i += 1 << 32
         return JInteger.toString(i, radix)
+
+    # Métodos adicionais para manipulação de bits, como bitCount e highestOneBit
+    @staticmethod
+    def _to_signed_32(n: int) -> int:
+        n &= 0xFFFFFFFF
+        return n - 0x100000000 if n & 0x80000000 else n
+
+    @staticmethod
+    def bitCount(i: int) -> int:
+        return bin(i & 0xFFFFFFFF).count('1')
+
+    @staticmethod
+    def highestOneBit(i: int) -> int:
+        i &= 0xFFFFFFFF
+        if i == 0: return 0
+        return JInteger._to_signed_32(1 << (i.bit_length() - 1))
