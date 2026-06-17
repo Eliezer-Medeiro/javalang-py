@@ -66,14 +66,14 @@ class JInteger:
 
             if radix < 2 or radix > 36:
                 raise ValueError("Radix must be between 2 and 36")
-            
+
             if i == 0:
                 return "0"
-                
+
             if i < 0:
                 # Caso seja negativo, reaproveita a lógica com o valor positivo
                 return '-' + JInteger.toString(-i, radix)
-            
+
             digits = "0123456789abcdefghijklmnopqrstuvwxyz"
             result = ""
             n = i
@@ -81,7 +81,7 @@ class JInteger:
                 result = digits[n % radix] + result
                 n //= radix
             return result
-        
+
         # Se foi chamado como instância: obj.toString()
         return str(self.value)
     # Implementação de métodos de comparação e igualdade no JInteger
@@ -161,17 +161,17 @@ class JInteger:
     def toBinaryString(i: int) -> str:
         """Retorna a representation binária de um inteiro."""
         return JInteger.toString(i & 0xFFFFFFFF, 2)
-    
+
     @staticmethod
     def toOctalString(i: int) -> str:
         """Retorna a representação octal de um inteiro."""
         return JInteger.toString(i & 0xFFFFFFFF, 8)
-    
+
     @staticmethod
     def toHexString(i: int) -> str:
         """Retorna a representação hexadecimal de um inteiro."""
         return JInteger.toString(i & 0xFFFFFFFF, 16)
-    
+
     @staticmethod
     def toUnsignedString(i: int, radix: int = 10) -> str:
         """Retorna a representação string de um inteiro tratado como unsigned."""
