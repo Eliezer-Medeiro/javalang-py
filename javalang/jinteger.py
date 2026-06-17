@@ -192,9 +192,10 @@ class JInteger:
     @staticmethod
     def highestOneBit(i: int) -> int:
         i &= 0xFFFFFFFF
-        if i == 0: return 0
+        if i == 0:
+            return 0
         return JInteger._to_signed_32(1 << (i.bit_length() - 1))
-    
+
     # Metodo lowestOneBit e numberOfLeadingZeros e numberOfTrailingZeros
     @staticmethod
     def lowestOneBit(i: int) -> int:
@@ -210,7 +211,7 @@ class JInteger:
     def numberOfTrailingZeros(i: int) -> int:
         i &= 0xFFFFFFFF
         return (i & (~i + 1)).bit_length() - 1 if i != 0 else 32
-    
+
     # Métodos adicionais para manipulação de bits, como reverse e rotateLeft
     @staticmethod
     def reverse(i: int) -> int:
@@ -220,20 +221,23 @@ class JInteger:
     @staticmethod
     def reverseBytes(i: int) -> int:
         i &= 0xFFFFFFFF
-        return JInteger._to_signed_32(((i >> 24) & 0xFF) | ((i >> 8) & 0xFF00) | 
+        return JInteger._to_signed_32(((i >> 24) & 0xFF) | ((i >> 8) & 0xFF00) |
                                       ((i << 8) & 0xFF0000) | ((i << 24) & 0xFF000000))
 
     @staticmethod
     def rotateLeft(i: int, distance: int) -> int:
         i &= 0xFFFFFFFF
         dist = distance & 31
-        return JInteger._to_signed_32((i << dist) | (i >> (32 - dist)))
-    
+        res = ((i << dist) | (i >> (32 - dist))) & 0xFFFFFFFF
+        return JInteger._to_signed_32(res)
+
     @staticmethod
     def rotateRight(i: int, distance: int) -> int:
-        i &= 0xFFFFFFFF
+        i &= 0xFFFFFFFF  # Trata como 32 bits unsigned
         dist = distance & 31
-        return JInteger._to_signed_32((i >> dist) | (i << (32 - dist)))
+        # Rotaciona como unsigned e aplica a máscara
+        res = ((i >> dist) | (i << (32 - dist))) & 0xFFFFFFFF
+        return JInteger._to_signed_32(res)
 
     @staticmethod
     def signum(i: int) -> int:
