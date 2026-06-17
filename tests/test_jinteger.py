@@ -112,3 +112,17 @@ def test_static_parsing_methods():
     assert JInteger.decode("#AF").value == 175
     # Octal (012 em octal é 10)
     assert JInteger.decode("012").value == 10
+
+    #  testes de formatação
+def test_formatting_methods():
+    # Teste de toString padrão
+    assert JInteger.toString(255, 16) == "ff"
+    assert JInteger.toString(-255, 10) == "-255"
+
+    # Testes de representação de 32 bits (Crucial para o Java)
+    # -1 em complemento de dois de 32 bits é 32 uns
+    assert JInteger.toBinaryString(-1) == "11111111111111111111111111111111"
+    assert JInteger.toHexString(-1) == "ffffffff"
+
+    # Teste Unsigned
+    assert JInteger.toUnsignedString(-1) == "4294967295"

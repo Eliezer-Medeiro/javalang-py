@@ -48,31 +48,42 @@ class JInteger:
         """Retorna o valor do JInteger como um double (64 bits)"""
         return float(self.value)
 
-    def toString(self, i: int = None, radix: int = 10) -> str:
+    def toString(self, *args, **kwargs) -> str:
         """
         Implementação unificada de toString (instância) e toString (estático).
-        Se 'i' for fornecido, comporta-se como o método estático do Java.
-        Se 'i' for omitido, comporta-se como o método de instância.
+        Preserva rigorosamente o nome exigido e resolve o erro F811.
         """
-        if i is not None:
-            # Lógica do método estático (convertendo base)
+        # Se foi chamado estaticamente: JInteger.toString(255, 16)
+        # O 'self' na verdade será o primeiro número inteiro enviado
+        if isinstance(self, int) or len(args) > 0 or "i" in kwargs:
+            # Descobre quem é o 'i' e quem é o 'radix' baseado em como foi chamado
+            if isinstance(self, int):
+                i = self
+                radix = args[0] if len(args) > 0 else kwargs.get("radix", 10)
+            else:
+                i = args[0] if len(args) > 0 else kwargs.get("i")
+                radix = args[1] if len(args) > 1 else kwargs.get("radix", 10)
+
             if radix < 2 or radix > 36:
                 raise ValueError("Radix must be between 2 and 36")
+            
+            if i == 0:
+                return "0"
+                
             if i < 0:
-                # Nota: para os métodos estáticos, a especificação Java
-                # para números negativos deve usar a máscara de 32 bits
-                return JInteger.toString(None, i & 0xFFFFFFFF, radix)
-
+                # Caso seja negativo, reaproveita a lógica com o valor positivo
+                return '-' + JInteger.toString(-i, radix)
+            
             digits = "0123456789abcdefghijklmnopqrstuvwxyz"
-            res = ""
-            while i >= radix:
-                res = digits[i % radix] + res
-                i //= radix
-            return digits[i] + res
-
-        # Comporta-se como o método de instância original
+            result = ""
+            n = i
+            while n > 0:
+                result = digits[n % radix] + result
+                n //= radix
+            return result
+        
+        # Se foi chamado como instância: obj.toString()
         return str(self.value)
-
     # Implementação de métodos de comparação e igualdade no JInteger
 
     def hashCode(self) -> int:
@@ -147,24 +158,23 @@ class JInteger:
         return JInteger(int(nm, 0))
 
     @staticmethod
+    def toBinaryString(i: int) -> str:
+        """Retorna a representation binária de um inteiro."""
+        return JInteger.toString(i & 0xFFFFFFFF, 2)
+    
+    @staticmethod
+    def toOctalString(i: int) -> str:
+        """Retorna a representação octal de um inteiro."""
+        return JInteger.toString(i & 0xFFFFFFFF, 8)
+    
+    @staticmethod
+    def toHexString(i: int) -> str:
+        """Retorna a representação hexadecimal de um inteiro."""
+        return JInteger.toString(i & 0xFFFFFFFF, 16)
+    
+    @staticmethod
     def toUnsignedString(i: int, radix: int = 10) -> str:
         """Retorna a representação string de um inteiro tratado como unsigned."""
         if i < 0:
-            i += 1 << 32  # Tratar como unsigned
+            i += 1 << 32
         return JInteger.toString(i, radix)
-
-    @staticmethod
-    def toBinaryString(i: int) -> str:
-        """Retorna a representação binária de 32 bits (unsigned)."""
-        # Aplica máscara para garantir 32 bits de representação (comportamento Java)
-        return JInteger.toString(i & 0xFFFFFFFF, 2)
-
-    @staticmethod
-    def toOctalString(i: int) -> str:
-        """Retorna a representação octal de 32 bits (unsigned)."""
-        return JInteger.toString(i & 0xFFFFFFFF, 8)
-
-    @staticmethod
-    def toHexString(i: int) -> str:
-        """Retorna a representação hexadecimal de 32 bits (unsigned)."""
-        return JInteger.toString(i & 0xFFFFFFFF, 16)
