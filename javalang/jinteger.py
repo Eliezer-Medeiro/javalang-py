@@ -21,6 +21,7 @@ class JInteger:
         else:
             self.value = int(value)
 
+    #Implementação de métodos de conversão para tipos numéricos no JInteger
     def byteValue(self) -> int:
         """Retorna o valor do JInteger como um byte (8 bits)"""
         return (self.value + 128) % 256 - 128
@@ -37,3 +38,16 @@ class JInteger:
         """Retorna o valor do JInteger como um long (64 bits)"""
         return self.value
 
+
+    #Implementação de métodos de conversão para ponto flutuante e texto no JInteger
+    def floatValue(self) -> float:
+        """Retorna o valor do JInteger como um float (32 bits)"""
+        return float(self.value)
+
+    def doubleValue(self) -> float:
+        """Retorna o valor do JInteger como um double (64 bits)"""
+        return float(self.value)
+
+    def toString(self) -> str:
+        """Retorna a representação string do valor do JInteger"""
+        return str(self.value)

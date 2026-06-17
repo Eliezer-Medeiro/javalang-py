@@ -38,3 +38,15 @@ def test_value_methods_integer():
     # Testando longValue
     assert jint.longValue() == 300
 
+def test_float_double_and_string_methods():
+    jint = JInteger(123)
+
+    # Testando floatValue
+    assert jint.floatValue() == 123.0
+
+    # Testando doubleValue
+    assert jint.doubleValue() == 123.0
+
+    # Testando toString
+    assert jint.toString() == "123"
+
