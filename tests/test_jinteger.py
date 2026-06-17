@@ -6,3 +6,19 @@ def test_constants_integer():
     assert JInteger.SIZE == 32
     assert JInteger.BYTES == 4
     assert JInteger.TYPE is int
+
+def test_constructor_integer():
+    # Testando a criação de JInteger com um inteiro
+    jint1 = JInteger(123)
+    assert jint1.value == 123
+
+    # Testando a criação de JInteger com uma string numérica
+    jint2 = JInteger("456")
+    assert jint2.value == 456
+
+    # Testando a criação de JInteger com uma string inválida
+    try:
+        JInteger("abc")
+        assert False, "Expected ValueError for invalid string"
+    except ValueError as e:
+        assert str(e) == "Invalid string for JInteger: 'abc'"

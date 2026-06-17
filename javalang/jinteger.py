@@ -1,4 +1,4 @@
-from typing import Final, Type
+from typing import Final, Type, Union
 
 
 class JInteger:
@@ -11,6 +11,13 @@ class JInteger:
     #TYPE representa o tipo primitivo int do Java SE 8
     TYPE: Final[Type[int]] = int
 
-    # se não passar nenhum valor, o valor padrão será 0
-    def __init__(self, value: int=0):
-        self.value = value
+    # Construtores, se receber uma string "123" é transformado em inteiro 123
+    def __init__(self, value: Union[int, str]=0):
+        if isinstance(value, str):
+            try:
+                self.value = int(value)
+            except ValueError as e:
+                raise ValueError(f"Invalid string for JInteger: '{value}'") from e
+        else:
+            self.value = int(value)
+
