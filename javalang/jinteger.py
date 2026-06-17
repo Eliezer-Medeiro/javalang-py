@@ -10,7 +10,7 @@ class JInteger:
 
     #TYPE representa o tipo primitivo int do Java SE 8
     TYPE: Final[Type[int]] = int
-    
+
     # se não passar nenhum valor, o valor padrão será 0
     def __init__(self, value: int=0):
         self.value = value
