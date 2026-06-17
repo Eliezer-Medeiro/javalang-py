@@ -7,6 +7,7 @@ select = ["E", "F", "W"]
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q"
+pythonpath = ["."]
 testpaths = [
     "tests",
 ]
