@@ -210,3 +210,21 @@ class JInteger:
     def numberOfTrailingZeros(i: int) -> int:
         i &= 0xFFFFFFFF
         return (i & (~i + 1)).bit_length() - 1 if i != 0 else 32
+    
+    # Métodos adicionais para manipulação de bits, como reverse e rotateLeft
+    @staticmethod
+    def reverse(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return JInteger._to_signed_32(int(f"{i:032b}"[::-1], 2))
+
+    @staticmethod
+    def reverseBytes(i: int) -> int:
+        i &= 0xFFFFFFFF
+        return JInteger._to_signed_32(((i >> 24) & 0xFF) | ((i >> 8) & 0xFF00) | 
+                                      ((i << 8) & 0xFF0000) | ((i << 24) & 0xFF000000))
+
+    @staticmethod
+    def rotateLeft(i: int, distance: int) -> int:
+        i &= 0xFFFFFFFF
+        dist = distance & 31
+        return JInteger._to_signed_32((i << dist) | (i >> (32 - dist)))
