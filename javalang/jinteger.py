@@ -228,3 +228,13 @@ class JInteger:
         i &= 0xFFFFFFFF
         dist = distance & 31
         return JInteger._to_signed_32((i << dist) | (i >> (32 - dist)))
+    
+    @staticmethod
+    def rotateRight(i: int, distance: int) -> int:
+        i &= 0xFFFFFFFF
+        dist = distance & 31
+        return JInteger._to_signed_32((i >> dist) | (i << (32 - dist)))
+
+    @staticmethod
+    def signum(i: int) -> int:
+        return 1 if i > 0 else (-1 if i < 0 else 0)
