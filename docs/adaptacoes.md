@@ -65,3 +65,16 @@ Este documento regista formalmente as decisões de engenharia de software adotad
 * **Conformidade:** Implementados todos os 10 métodos conforme a API estática do Java `java.lang.Integer`.
 * **Tratamento de bits:** Dada a natureza de precisão arbitrária do `int` em Python, todos os métodos utilizam a máscara `& 0xFFFFFFFF` para emular o registo de 32 bits da JVM.
 * **Complemento de Dois:** Criado o método auxiliar `_to_signed_32` para garantir que o bit de sinal seja preservado em operações de rotação e inversão, mantendo a paridade com o comportamento de números negativos do Java.
+
+---
+
+## 7. Métodos de Aritmética Estática
+* **Conformidade:** Implementados `sum`, `max` e `min` conforme a API do Java SE 8.
+* **Overflow de 32 bits:** No método `sum`, devido à precisão arbitrária do Python, utilizou-se o método auxiliar `_to_signed_32` para forçar o comportamento de *overflow* cíclico do complemento de dois (ex: somar 1 ao valor máximo de 32 bits resulta no valor mínimo negativo), replicando fielmente o comportamento da JVM.
+
+---
+
+## 8. Comparações e Aritmética Sem Sinal (Unsigned Operations)
+* **Conformidade:** Implementados `compare`, `compareUnsigned`, `divideUnsigned` e `remainderUnsigned` conforme Java SE 8.
+* **Mapeamento de Exceções:** Alterada a interceção de divisão por zero de `ValueError` para `ZeroDivisionError`, alinhando o comportamento com a `ArithmeticException` do Java de forma idiomática em Python.
+* **Semântica Unsigned:** Utilizou-se a máscara `& 0xFFFFFFFF` para converter números negativos em suas representações equivalentes de magnitude unsigned de 32 bits (ex: `-1` interpretado como `4294967295`), garantindo que divisões, restos e comparações operem sob a especificação correta da JVM.
