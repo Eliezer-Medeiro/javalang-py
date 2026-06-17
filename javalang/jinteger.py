@@ -242,3 +242,18 @@ class JInteger:
     @staticmethod
     def signum(i: int) -> int:
         return 1 if i > 0 else (-1 if i < 0 else 0)
+
+    # Aritmetica estatica
+    @staticmethod
+    def sum(a: int, b: int) -> int:
+        """Retorna a soma de dois inteiros simulando overflow de 32 bits."""
+        return JInteger._to_signed_32(a + b)
+
+    @staticmethod
+    def max(a: int, b: int) -> int:
+        return JInteger._to_signed_32(a if a > b else b)
+
+    @staticmethod
+    def min(a: int, b: int) -> int:
+        return a if a < b else b
+
