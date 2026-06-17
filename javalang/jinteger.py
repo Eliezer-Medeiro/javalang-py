@@ -51,3 +51,29 @@ class JInteger:
     def toString(self) -> str:
         """Retorna a representação string do valor do JInteger"""
         return str(self.value)
+
+    # Implementação de métodos de comparação e igualdade no JInteger
+
+    def hashCode(self) -> int:
+        """Retorna o hash code do JInteger, que é o próprio valor inteiro"""
+        return self.value
+
+    def __hash__(self) -> int:
+        """Permite que JInteger seja usado em estruturas de dados baseadas em hash"""
+        return self.hashCode()
+
+    def equals(self, other) -> bool:
+        """Verifica se outro objeto é igual a este JInteger"""
+        if isinstance(other, JInteger):
+            return self.value == other.value
+        return False
+
+    def __eq__(self, other) -> bool:
+        """Permite comparação de igualdade usando o operador =="""
+        return self.equals(other)
+
+    def compareTo(self, other) -> int:
+        """Compara este JInteger com outro JInteger"""
+        if not isinstance(other, JInteger):
+            raise TypeError("Can only compare with another JInteger")
+        return (self.value > other.value) - (self.value < other.value)
