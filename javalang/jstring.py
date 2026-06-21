@@ -129,3 +129,62 @@ class JString:
         except LookupError:
             msg = f"UnsupportedEncodingException: {charsetName}"
             raise ValueError(msg)
+
+    def codePointAt(self, index: int) -> int:
+        """Retorna o codigo Unicode (Code Point) no indice dado."""
+        if index < 0 or index >= len(self.value):
+            msg = f"String index out of range: {index}"
+            raise IndexError(msg)
+        return ord(self.value[index])
+
+    def codePointBefore(self, index: int) -> int:
+        """Retorna o codigo Unicode no indice anterior ao fornecido."""
+        if index < 1 or index > len(self.value):
+            msg = f"String index out of range: {index}"
+            raise IndexError(msg)
+        return ord(self.value[index - 1])
+
+    def codePointCount(self, beginIndex: int, endIndex: int) -> int:
+        """Retorna o numero de Code Points no intervalo especificado."""
+        if (
+            beginIndex < 0
+            or endIndex > len(self.value)
+            or beginIndex > endIndex
+        ):
+            msg = "IndexOutOfBoundsException: indices invalidos"
+            raise IndexError(msg)
+        # Em Python nativo, cada elemento de str já representa um code point
+        return len(self.value[beginIndex:endIndex])
+
+    def offsetByCodePoints(self, index: int, codePointOffset: int) -> int:
+        """Retorna o indice deslocado pelo offset de Code Points."""
+        if index < 0 or index > len(self.value):
+            msg = f"String index out of range: {index}"
+            raise IndexError(msg)
+        target = index + codePointOffset
+        if target < 0 or target > len(self.value):
+            msg = "IndexOutOfBoundsException: deslocamento invalido"
+            raise IndexError(msg)
+        return target
+
+    def getChars(
+        self, srcBegin: int, srcEnd: int, dst: list, dstBegin: int
+    ) -> None:
+        """Copia os caracteres desta string para o array de destino."""
+        if (
+            srcBegin < 0
+            or srcEnd > len(self.value)
+            or srcBegin > srcEnd
+        ):
+            msg = "IndexOutOfBoundsException: limites da origem invalidos"
+            raise IndexError(msg)
+
+        chars_to_copy = list(self.value[srcBegin:srcEnd])
+        length = len(chars_to_copy)
+
+        if dstBegin < 0 or (dstBegin + length) > len(dst):
+            msg = "IndexOutOfBoundsException: limites do destino invalidos"
+            raise IndexError(msg)
+
+        # Modifica a lista destino in-place
+        dst[dstBegin : dstBegin + length] = chars_to_copy

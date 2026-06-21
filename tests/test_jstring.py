@@ -67,3 +67,51 @@ def test_jstring_access_and_size():
     # Teste de UnsupportedEncodingException via ValueError
     with pytest.raises(ValueError):
         s.getBytes("CHARSET_FALSO")
+
+
+def test_jstring_access_code_points_and_get_chars():
+    # 'A' (65), 'B' (66), '😀' (128512)
+    s = JString("AB😀")
+
+    # 1. Teste codePointAt(int)
+    assert s.codePointAt(0) == 65
+    assert s.codePointAt(2) == 128512
+    with pytest.raises(IndexError):
+        s.codePointAt(-1)
+    with pytest.raises(IndexError):
+        s.codePointAt(3)
+
+    # 2. Teste codePointBefore(int)
+    assert s.codePointBefore(1) == 65
+    assert s.codePointBefore(3) == 128512
+    with pytest.raises(IndexError):
+        s.codePointBefore(0)
+    with pytest.raises(IndexError):
+        s.codePointBefore(4)
+
+    # 3. Teste codePointCount(int, int)
+    assert s.codePointCount(0, 3) == 3
+    assert s.codePointCount(1, 3) == 2
+    with pytest.raises(IndexError):
+        s.codePointCount(-1, 2)
+    with pytest.raises(IndexError):
+        s.codePointCount(2, 1)
+
+    # 4. Teste offsetByCodePoints(int, int)
+    assert s.offsetByCodePoints(0, 2) == 2
+    assert s.offsetByCodePoints(3, -2) == 1
+    with pytest.raises(IndexError):
+        s.offsetByCodePoints(0, 5)
+    with pytest.raises(IndexError):
+        s.offsetByCodePoints(1, -3)
+
+    # 5. Teste getChars(int, int, char[], int)
+    destino = ["-", "-", "-", "-", "-"]
+    s.getChars(0, 2, destino, 1)  # Copia "AB" para as posições 1 e 2
+    assert destino == ["-", "A", "B", "-", "-"]
+
+    # Testes de exceção para getChars
+    with pytest.raises(IndexError):
+        s.getChars(-1, 2, destino, 0)
+    with pytest.raises(IndexError):
+        s.getChars(0, 2, destino, 4)  # Fora dos limites do destino
