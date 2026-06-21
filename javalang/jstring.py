@@ -282,3 +282,67 @@ class JString:
     def __hash__(self) -> int:
         """Dunder method para tornar JString 'hashable' em sets e dicts."""
         return self.hashCode()
+
+    def indexOf(
+        self, ch_or_str: Union[int, str, 'JString'], fromIndex: int = 0
+    ) -> int:
+        """Retorna o indice da primeira ocorrencia do caractere ou substring."""
+        if isinstance(ch_or_str, JString):
+            target = ch_or_str.value
+        elif isinstance(ch_or_str, int):
+            target = chr(ch_or_str)
+        else:
+            target = str(ch_or_str)
+
+        # Java trata indices negativos em indexOf como 0
+        from_idx = max(0, fromIndex)
+        return self.value.find(target, from_idx)
+
+    def lastIndexOf(
+        self, ch_or_str: Union[int, str, 'JString'], fromIndex: Optional[int] = None
+    ) -> int:
+        """Retorna o indice da ultima ocorrencia do caractere ou substring."""
+        if isinstance(ch_or_str, JString):
+            target = ch_or_str.value
+        elif isinstance(ch_or_str, int):
+            target = chr(ch_or_str)
+        else:
+            target = str(ch_or_str)
+
+        if fromIndex is None:
+            return self.value.rfind(target)
+
+        # Se fromIndex < 0, Java não encontra nada (retorna -1)
+        if fromIndex < 0:
+            return -1
+
+        # rfind(sub, start, end) procura dentro de s[start:end].
+        # Para bater com o limite superior do Java, end = fromIndex + len(target)
+        end_idx = min(len(self.value), fromIndex + len(target))
+        return self.value.rfind(target, 0, end_idx)
+
+    def contains(self, s: Any) -> bool:
+        """Retorna true se a string contiver a sequencia de caracteres especificada."""
+        if isinstance(s, JString):
+            target = s.value
+        elif hasattr(s, "toString"):
+            target = s.toString()
+        else:
+            target = str(s)
+        return target in self.value
+
+    def startsWith(
+        self, prefix: Union[str, 'JString'], toffset: int = 0
+    ) -> bool:
+        """Testa se a substring inicia com o prefixo dado."""
+        target = (
+            prefix.value if isinstance(prefix, JString) else str(prefix)
+        )
+        if toffset < 0 or toffset > len(self.value):
+            return False
+        return self.value.startswith(target, toffset)
+
+    def endsWith(self, suffix: Union[str, 'JString']) -> bool:
+        """Testa se esta string termina com o sufixo especificado."""
+        target = suffix.value if isinstance(suffix, JString) else str(suffix)
+        return self.value.endswith(target)

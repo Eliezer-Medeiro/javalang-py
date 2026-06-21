@@ -176,3 +176,61 @@ def test_jstring_compare_and_region():
     # Teste de limites negativos/fora da string
     assert not s1.regionMatches(0, JString("X"), 0, 50)
     assert not s1.regionMatches(-1, JString("X"), 0, 1)
+
+class MockCharSequence:
+    def toString(self):
+        return "Py"
+
+def test_jstring_index_of():
+    s = JString("aabaabaa")
+
+    # indexOf(int ch) -> 'b' é 98
+    assert s.indexOf(98) == 2
+    # indexOf(String str)
+    assert s.indexOf("a") == 0
+    assert s.indexOf(JString("ab")) == 1
+
+    # indexOf(int/String, fromIndex)
+    assert s.indexOf("a", 2) == 3
+    assert s.indexOf("b", 3) == 5
+    assert s.indexOf("x") == -1
+    assert s.indexOf("a", -5) == 0
+
+def test_jstring_last_index_of():
+    s = JString("aabaabaa")
+
+    # lastIndexOf(int)
+    assert s.lastIndexOf(98) == 5
+    # lastIndexOf(String)
+    assert s.lastIndexOf("a") == 7
+    assert s.lastIndexOf("ab") == 4
+
+    # lastIndexOf(..., fromIndex)
+    assert s.lastIndexOf("b", 4) == 2
+    assert s.lastIndexOf("b", 5) == 5
+    assert s.lastIndexOf("a", 2) == 1
+    assert s.lastIndexOf("a", -1) == -1  # fromIndex negativo = -1
+    assert s.lastIndexOf("x") == -1
+
+def test_jstring_contains():
+    s = JString("Java-Python")
+
+    assert s.contains("va-Py")
+    assert s.contains(JString("-"))
+    assert s.contains(MockCharSequence())
+    assert not s.contains("C++")
+
+def test_jstring_starts_and_ends_with():
+    s = JString("Hello World")
+
+    # startsWith
+    assert s.startsWith("Hello")
+    assert s.startsWith(JString("World"), 6)
+    assert not s.startsWith("Hello", 1)
+    assert not s.startsWith("Hello", -1)  # offset negativo
+    assert not s.startsWith("Hello", 50)  # offset maior que len
+
+    # endsWith
+    assert s.endsWith("World")
+    assert s.endsWith(JString("rld"))
+    assert not s.endsWith("Hello")
