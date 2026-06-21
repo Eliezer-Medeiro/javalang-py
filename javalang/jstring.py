@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import List, Union, Optional, Any
 
+from numpy import iterable
+
 
 class JString:
     #CONSTRUTORES
@@ -456,3 +458,33 @@ class JString:
                 while res and not res[-1]:
                     res.pop()
         return res
+
+    @staticmethod
+    def valueOf(val: Any) -> 'JString':
+        """Converte polimorficamente tipos primitivos e objetos em JString."""
+        if val is None:
+            return JString("null")
+        if isinstance(val, bool):
+            return JString("true" if val else "false")
+        if isinstance(val, list):
+            return JString("".join(str(c) for c in val))
+        return JString(str(val))
+
+    @staticmethod
+    def copyValueOf(data: list) -> 'JString':
+        """Alias semantico para valueOf(char[])."""
+        return JString.valueOf(data)
+
+    @staticmethod
+    def join(delimiter: Any, elements: iterable) -> 'JString':
+        """Concatena os elementos utilizando o delimitador fornecido."""
+        delim_str = delimiter.value if hasattr(delimiter, 'value') else str(delimiter)
+        raw_elements = [e.value if hasattr(e, 'value') else str(e) for e in elements]
+        return JString(delim_str.join(raw_elements))
+
+    @staticmethod
+    def format(fmt: Any, *args: Any) -> 'JString':
+        """Motor de formatacao baseado em placeholders estilo Java/C."""
+        fmt_str = fmt.value if hasattr(fmt, 'value') else str(fmt)
+        raw_args = tuple(a.value if hasattr(a, 'value') else a for a in args)
+        return JString(fmt_str % raw_args)

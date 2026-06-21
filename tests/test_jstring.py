@@ -336,3 +336,22 @@ def test_jstring_split_limit():
     # Teste de sobrecarga (split sem parâmetro assume limit=0)
     res_default = s.split("o")
     assert res_default == ["b", "", ":and:f"]
+
+def test_value_of_primitivos():
+    assert JString.valueOf(True).value == "true"
+    assert JString.valueOf(False).value == "false"
+    assert JString.valueOf(100).value == "100"
+    assert JString.valueOf(10.5).value == "10.5"
+    assert JString.valueOf(None).value == "null"
+
+    class CustomObj:
+        def __str__(self): return "custom"
+    assert JString.valueOf(CustomObj()).value == "custom"
+
+def test_value_of_char_array_and_aliases():
+    assert JString.valueOf(['j', 'a', 'v', 'a']).value == "java"
+    assert JString.copyValueOf(['g', 'c', 's']).value == "gcs"
+
+def test_jstring_join_and_format():
+    assert JString.join("-", ["A", "B", "C"]).value == "A-B-C"
+    assert JString.format("Nota: %d para %s", 10, "GCS").value == "Nota: 10 para GCS"
