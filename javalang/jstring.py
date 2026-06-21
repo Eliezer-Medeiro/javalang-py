@@ -346,3 +346,62 @@ class JString:
         """Testa se esta string termina com o sufixo especificado."""
         target = suffix.value if isinstance(suffix, JString) else str(suffix)
         return self.value.endswith(target)
+
+    def substring(
+        self, beginIndex: int, endIndex: Optional[int] = None
+    ) -> JString:
+        """Retorna uma nova string que e substring desta string."""
+        if endIndex is None:
+            endIndex = len(self.value)
+
+        # Validacoes estritas do Java (StringIndexOutOfBoundsException)
+        if beginIndex < 0 or endIndex > len(self.value) or beginIndex > endIndex:
+            msg = "StringIndexOutOfBoundsException: limites invalidos"
+            raise IndexError(msg)
+
+        return JString(self.value[beginIndex:endIndex])
+
+    def subSequence(self, beginIndex: int, endIndex: int) -> JString:
+        """Retorna uma nova sequencia de caracteres (JString)."""
+        return self.substring(beginIndex, endIndex)
+
+    def concat(self, str_arg: Union[str, 'JString']) -> JString:
+        """Concatena a string especificada ao final desta string."""
+        other_val = str_arg.value if isinstance(str_arg, JString) else str(str_arg)
+
+        # Se a string a ser concatenada for vazia, Java retorna a propria instancia
+        if not other_val:
+            return self
+
+        return JString(self.value + other_val)
+
+    def replace(
+        self,
+        target: Union[int, str, 'JString'],
+        replacement: Union[int, str, 'JString']
+    ) -> JString:
+        """Substitui ocorrencias de um caractere (Code Point) ou sequencia."""
+        old_val = chr(target) if isinstance(target, int) else (
+            target.value if isinstance(target, JString) else str(target)
+        )
+        new_val = chr(replacement) if isinstance(replacement, int) else (
+            replacement.value if isinstance(replacement, JString) else str(replacement)
+        )
+        return JString(self.value.replace(old_val, new_val))
+
+    def toLowerCase(self) -> JString:
+        """Converte todos os caracteres para minusculas."""
+        return JString(self.value.lower())
+
+    def toUpperCase(self) -> JString:
+        """Converte todos os caracteres para maiusculas."""
+        return JString(self.value.upper())
+
+    def trim(self) -> JString:
+        """Remove espacos em branco nas extremidades."""
+        return JString(self.value.strip())
+
+    def intern(self) -> JString:
+        """Retorna a representacao canonica para o pool de strings."""
+        import sys
+        return JString(sys.intern(self.value))

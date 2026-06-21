@@ -1,4 +1,5 @@
 import pytest
+import sys
 from javalang.jstring import JString
 
 class MockStringBuilder:
@@ -234,3 +235,66 @@ def test_jstring_starts_and_ends_with():
     assert s.endsWith("World")
     assert s.endsWith(JString("rld"))
     assert not s.endsWith("Hello")
+
+
+def test_jstring_substring_and_subsequence():
+    s = JString("Python-Java")
+
+    # substring(beginIndex)
+    assert s.substring(7).value == "Java"
+
+    # substring(beginIndex, endIndex)
+    assert s.substring(0, 6).value == "Python"
+
+    # subSequence(beginIndex, endIndex)
+    assert s.subSequence(0, 6).value == "Python"
+
+    # Exceções
+    with pytest.raises(IndexError):
+        s.substring(-1)
+    with pytest.raises(IndexError):
+        s.substring(5, 20)
+    with pytest.raises(IndexError):
+        s.substring(4, 2)  # begin > end
+
+def test_jstring_concat():
+    s1 = JString("Hello")
+
+    # concat com string nativa
+    s2 = s1.concat(" World")
+    assert s2.value == "Hello World"
+
+    # concat com JString
+    s3 = s1.concat(JString("!"))
+    assert s3.value == "Hello!"
+
+    # Otimização de concat vazio (retorna a mesma instância)
+    s4 = s1.concat("")
+    assert s1 is s4
+
+def test_jstring_replace():
+    s = JString("aabaa")
+
+    # replace(char, char) -> usando ASCII Code Points
+    # 97='a', 98='b'
+    assert s.replace(97, 98).value == "bbbbb"
+
+    # replace(CharSequence, CharSequence)
+    assert s.replace("aa", "x").value == "xbx"
+    assert s.replace(JString("b"), JString("c")).value == "aacaa"
+
+def test_jstring_casing_and_trim():
+    s = JString("  JaVa  \n")
+
+    assert s.toLowerCase().value == "  java  \n"
+    assert s.toUpperCase().value == "  JAVA  \n"
+
+    assert s.trim().value == "JaVa"
+
+def test_jstring_intern():
+    s1 = JString("test_pool")
+    s2 = s1.intern()
+
+    # Garante que as strings internas são a mesma referência no pool do Python
+    assert sys.intern("test_pool") is s2.value
+
