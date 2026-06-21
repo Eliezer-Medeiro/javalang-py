@@ -78,3 +78,50 @@ Este documento regista formalmente as decisões de engenharia de software adotad
 * **Conformidade:** Implementados `compare`, `compareUnsigned`, `divideUnsigned` e `remainderUnsigned` conforme Java SE 8.
 * **Mapeamento de Exceções:** Alterada a interceção de divisão por zero de `ValueError` para `ZeroDivisionError`, alinhando o comportamento com a `ArithmeticException` do Java de forma idiomática em Python.
 * **Semântica Unsigned:** Utilizou-se a máscara `& 0xFFFFFFFF` para converter números negativos em suas representações equivalentes de magnitude unsigned de 32 bits (ex: `-1` interpretado como `4294967295`), garantindo que divisões, restos e comparações operem sob a especificação correta da JVM.
+
+---
+
+## 9. Construtores do Ciclo de Vida (JString)
+* **Simulação de Sobrecarga:** Como o Python não possui sobrecarga nativa de métodos por assinatura de tipo, unificou-se os 9 construtores do Java SE 8 num único inicializador `__init__`, fazendo a distinção em tempo de execução (*runtime*) via `isinstance` e análise de assinaturas posicionais opcionais (`arg2`, `arg3`).
+* **Tratamento de Exceções e Paridade de Tipos:** * A exceção Java `IndexOutOfBoundsException` foi traduzida de forma idiomática para `IndexError` no fatiamento de arrays.
+  * A `UnsupportedEncodingException` do Java dispara um `ValueError` quando o Python não reconhece o nome do charset fornecido.
+* **Resiliência a Bytes Corrompidos:** Diferente do comportamento do Python que lança um `UnicodeDecodeError`, o método foi configurado com `errors="replace"` para espelhar a especificação do Java, que substitui silenciosamente sequências malformadas pelo caractere padrão de substituição do Unicode (`\uFFFD`).
+
+---
+
+## 10. Métodos de Acesso e Tamanho - Parte 1 (JString)
+* **Controlo de Fronteiras de Índices (`charAt`):** O Python suporta nativamente indexação negativa (ex: `-1` acede ao último elemento). Para garantir a paridade estrita com o comportamento do Java SE 8, que lança `IndexOutOfBoundsException` para qualquer valor fora do intervalo contido entre `0` e `length() - 1`, foi embutida uma validação explícita antes do fatiamento, convertendo o erro para `IndexError`.
+* **Exportação Polimórfica de Bytes:** Unificou-se as duas assinaturas de `getBytes()` através de um argumento opcional padronizado como `None`. O método intercepta o `LookupError` do interpretador Python caso o utilizador passe um identificador de *charset* inválido, encapsulando-o num `ValueError` com o rótulo da exceção original (`UnsupportedEncodingException`).
+
+---
+
+## 11. Métodos de Acesso e Tamanho - Parte 2 (JString)
+* **Equivalência de UTF-16 para UTF-8 Nativo (Code Points):** Em Java, strings internas usam codificação UTF-16, onde caracteres suplementares (como Emojis) ocupam dois *chars* (surrogate pairs). No Python, strings nativas são armazenadas usando uma estratégia dinâmica (PEP 393) onde cada elemento do fatiamento já representa um Code Point completo e isolado. Por conseguinte, os métodos `codePointAt`, `codePointBefore` e `codePointCount` puderam ser mapeados de forma simplificada através da função nativa `ord()`, mantendo a paridade de retornos numéricos dos pontos de código sem a necessidade de processar pares substitutos manualmente.
+* **Mutação de Parâmetros Externos (`getChars`):** O método `getChars` quebra o paradigma de imutabilidade geral da classe ao alterar diretamente o estado de uma lista passada como argumento (`dst`). Isso foi implementado via fatiamento destrutivo *in-place* (`dst[begin:end] = ...`), mantendo a compatibilidade com a assinatura por referência do Java.
+
+---
+
+## 12. Comparação, Igualdade e Hashing (JString)
+* **Polimorfismo em `regionMatches`**: Como o Python não suporta múltiplas assinaturas com o mesmo nome, utilizámos parâmetros opcionais para simular o comportamento de alternância de chamadas (com ou sem flag booleana `ignoreCase` na primeira posição).
+* **Paridade Estrita no `hashCode`**: O cálculo do *hash* de *strings* em Python é baseado no algoritmo SipHash e usa sementes aleatórias por questões de segurança (prevenção contra ataques DoS), originando resultados diferentes em cada execução. Para respeitar o contrato do Java, implementámos manualmente o algoritmo clássico de polinómio do Java SE (`s[0]*31^(n-1) + ...`), forçando a restrição matemática com sinal de 32 bits usando máscaras bit a bit (`& 0xFFFFFFFF`).
+* **Integração no Ecossistema Python**: Mapeámos internamente os métodos `equals()` e `hashCode()` para os métodos mágicos nativos do Python (`__eq__` e `__hash__`), conferindo assim compatibilidade total da `JString` com estruturas de dados baseadas em tabelas de dispersão, como dicionários (`dict`) e conjuntos (`set`).
+
+---
+
+## 13. Algoritmos de Busca, Varredura e Contenção (JString)
+* **Unificação de `indexOf` e `lastIndexOf`:** O Java possui 8 sobrecargas diferentes para tratar procuras textuais recebendo `int` (Code Points) ou `String`, com ou sem um ponto de partida. No Python, unificámos isto através da inspeção `isinstance` e parâmetros opcionais, convertendo inteiros via função `chr()` para garantir a paridade com procuras de caracteres Unicode.
+* **Uso de Operações Nativas em C:** Em vez de codificarmos loops em Python puro (que teriam baixa performance), utilizámos a integração direta com os métodos otimizados da classe `str` nativa (`find`, `rfind`, `startswith`, `endswith`). Estes métodos já cumprem estritamente o contrato de devolver `-1` em caso de "não encontrado" sem lançar exceções.
+* **Equivalência de `fromIndex` no `rfind`:** O comportamento de `lastIndexOf(str, fromIndex)` no Java impõe que a substring validada não pode começar depois de `fromIndex`. Como o `rfind` do Python opera pelo índice final de fatiamento exclusivo (`end`), emulámos este limite calculando `end_idx = fromIndex + len(target)`, replicando assim a mecânica da varredura retroativa com exatidão matemática.
+
+## 14. Transformação, Fatiamento e Substituição (JString)
+* **Polimorfismo em `replace`:** O Java diferencia formalmente as substituições de caracteres simples (`replace(char, char)`) das de texto literal (`replace(CharSequence, CharSequence)`). No Python, isso foi unificado numa única assinatura através de `isinstance`, convertendo inteiros isolados (*Code Points*) usando a função `chr()` e injetando na função de substituição literal e otimizada `.replace()` do Python.
+* **Comportamento do `intern()`:** O JDK suporta um *String Pool* global gerido nativamente pela memória JVM. Para replicar este conceito no Python, utilizámos a função nativa `sys.intern()`. Esta função regista a `str` do Python no pool interno da memória do interpretador CPython. A instância exterior da `JString` devolvida permanece nova para garantir a imutabilidade do encapsulador, mas a sua referência interna de texto partilha a memória com o cache global.
+* **Otimização no `concat`:** Assim como a classe Java original, o nosso método verifica o comprimento da string adicionada. Se estiver a tentar concatenar uma string vazia, o método quebra o processo de inicialização de novas instâncias e devolve `self` (a própria instância em memória).
+
+---
+
+## 15. Expressões Regulares (JString)
+* **Paridade de Comportamento em `matches`:** No ecossistema Java, o método `matches()` tenta sempre casar a expressão regular com a **string inteira**. Para evitar falsos positivos (onde um trecho casaria, mas não o texto completo), usou-se a função nativa `re.fullmatch()` do CPython em vez de `re.search()` ou `re.match()`.
+* **Motor Estrito de `split` por `limit`:** O comportamento do `limit` do Java em `split` é complexo e distinto do `maxsplit` do Python. 
+    * Quando `limit > 0`: Mapeado para `maxsplit = limit - 1`.
+    * Quando `limit == 0`: A especificação Java determina o descarte das instâncias vazias à direita do array resultante. Como o Python não remove entradas vazias passivamente, implementou-se um algoritmo *pop* em cauda (`while res and not res[-1]: res.pop()`) para forçar o descarte das extremidades nulas e espelhar o comportamento do JDK à risca.
