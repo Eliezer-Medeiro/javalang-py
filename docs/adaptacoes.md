@@ -78,3 +78,14 @@ Este documento regista formalmente as decisões de engenharia de software adotad
 * **Conformidade:** Implementados `compare`, `compareUnsigned`, `divideUnsigned` e `remainderUnsigned` conforme Java SE 8.
 * **Mapeamento de Exceções:** Alterada a interceção de divisão por zero de `ValueError` para `ZeroDivisionError`, alinhando o comportamento com a `ArithmeticException` do Java de forma idiomática em Python.
 * **Semântica Unsigned:** Utilizou-se a máscara `& 0xFFFFFFFF` para converter números negativos em suas representações equivalentes de magnitude unsigned de 32 bits (ex: `-1` interpretado como `4294967295`), garantindo que divisões, restos e comparações operem sob a especificação correta da JVM.
+
+---
+
+## 9. Construtores do Ciclo de Vida (JString)
+* **Simulação de Sobrecarga:** Como o Python não possui sobrecarga nativa de métodos por assinatura de tipo, unificou-se os 9 construtores do Java SE 8 num único inicializador `__init__`, fazendo a distinção em tempo de execução (*runtime*) via `isinstance` e análise de assinaturas posicionais opcionais (`arg2`, `arg3`).
+* **Tratamento de Exceções e Paridade de Tipos:** * A exceção Java `IndexOutOfBoundsException` foi traduzida de forma idiomática para `IndexError` no fatiamento de arrays.
+  * A `UnsupportedEncodingException` do Java dispara um `ValueError` quando o Python não reconhece o nome do charset fornecido.
+* **Resiliência a Bytes Corrompidos:** Diferente do comportamento do Python que lança um `UnicodeDecodeError`, o método foi configurado com `errors="replace"` para espelhar a especificação do Java, que substitui silenciosamente sequências malformadas pelo caractere padrão de substituição do Unicode (`\uFFFD`).
+
+---
+
