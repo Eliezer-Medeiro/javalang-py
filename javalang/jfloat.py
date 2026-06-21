@@ -45,3 +45,22 @@ class JFloat:
     @staticmethod
     def isFinite(value):
         return not (math.isnan(value) or math.isinf(value))
+def equals(self, other):
+    if isinstance(other, JFloat):
+        return self.value == other.value
+    if isinstance(other, (float, int)):
+        return self.value == float(other)
+    return False
+def hashCode(self):
+    return hash(self.value)
+def toString(self):
+    return str(self.value)
+def test_equals():
+    assert JFloat(1.0).equals(JFloat(1.0))
+    assert not JFloat(1.0).equals(JFloat(2.0))
+
+def test_hash():
+    assert JFloat(1.0).hashCode() == hash(1.0)
+
+def test_to_string():
+    assert JFloat(1.0).toString() == "1.0"
