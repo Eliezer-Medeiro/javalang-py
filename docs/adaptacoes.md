@@ -89,3 +89,6 @@ Este documento regista formalmente as decisões de engenharia de software adotad
 
 ---
 
+## 10. Métodos de Acesso e Tamanho - Parte 1 (JString)
+* **Controlo de Fronteiras de Índices (`charAt`):** O Python suporta nativamente indexação negativa (ex: `-1` acede ao último elemento). Para garantir a paridade estrita com o comportamento do Java SE 8, que lança `IndexOutOfBoundsException` para qualquer valor fora do intervalo contido entre `0` e `length() - 1`, foi embutida uma validação explícita antes do fatiamento, convertendo o erro para `IndexError`.
+* **Exportação Polimórfica de Bytes:** Unificou-se as duas assinaturas de `getBytes()` através de um argumento opcional padronizado como `None`. O método intercepta o `LookupError` do interpretador Python caso o utilizador passe um identificador de *charset* inválido, encapsulando-o num `ValueError` com o rótulo da exceção original (`UnsupportedEncodingException`).

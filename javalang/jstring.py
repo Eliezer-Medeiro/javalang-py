@@ -98,3 +98,34 @@ class JString:
 
     def __repr__(self) -> str:
         return f"JString('{self.value}')"
+
+    def length(self) -> int:
+        """Retorna o comprimento da string."""
+        return len(self.value)
+
+    def isEmpty(self) -> bool:
+        """Retorna true se length() for 0."""
+        return len(self.value) == 0
+
+    def charAt(self, index: int) -> str:
+        """Retorna o valor char no indice especificado."""
+        if index < 0 or index >= len(self.value):
+            msg = f"String index out of range: {index}"
+            raise IndexError(msg)
+        return self.value[index]
+
+    def toCharArray(self) -> List[str]:
+        """Converte esta string em um novo array de caracteres."""
+        return list(self.value)
+
+    def getBytes(self, charsetName: Optional[str] = None) -> bytes:
+        """Codifica esta JString em uma sequencia de bytes."""
+        if charsetName is None:
+            return self.value.encode("utf-8")
+
+        python_charset = self._map_charset(charsetName)
+        try:
+            return self.value.encode(python_charset)
+        except LookupError:
+            msg = f"UnsupportedEncodingException: {charsetName}"
+            raise ValueError(msg)

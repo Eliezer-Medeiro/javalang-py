@@ -29,3 +29,41 @@ def test_jstring_all_constructors():
 
     # Teste StringBuilder
     assert str(JString(MockStringBuilder())) == "conteudo_buffer"
+
+def test_jstring_access_and_size():
+    # Inicialização para os testes
+    s = JString("Java-Py")
+    vazia = JString("")
+
+    # 1. Teste length()
+    assert s.length() == 7
+    assert vazia.length() == 0
+
+    # 2. Teste isEmpty()
+    assert not s.isEmpty()
+    assert vazia.isEmpty()
+
+    # 3. Teste charAt(int) e limites
+    assert s.charAt(0) == "J"
+    assert s.charAt(4) == "-"
+    assert s.charAt(6) == "y"
+    with pytest.raises(IndexError):
+        s.charAt(-1)
+    with pytest.raises(IndexError):
+        s.charAt(7)
+
+    # 4. Teste toCharArray()
+    assert s.toCharArray() == ["J", "a", "v", "a", "-", "P", "y"]
+    assert vazia.toCharArray() == []
+
+    # 5. Teste getBytes() padrão (UTF-8)
+    assert s.getBytes() == b"Java-Py"
+
+    # 6. Teste getBytes(String charset) com múltiplos encodings
+    acentuada = JString("Olá")
+    assert acentuada.getBytes("ISO-8859-1") == b"Ol\xe1"
+    assert acentuada.getBytes("UTF-8") == b"Ol\xc3\xa1"
+
+    # Teste de UnsupportedEncodingException via ValueError
+    with pytest.raises(ValueError):
+        s.getBytes("CHARSET_FALSO")
