@@ -117,3 +117,11 @@ Este documento regista formalmente as decisões de engenharia de software adotad
 * **Polimorfismo em `replace`:** O Java diferencia formalmente as substituições de caracteres simples (`replace(char, char)`) das de texto literal (`replace(CharSequence, CharSequence)`). No Python, isso foi unificado numa única assinatura através de `isinstance`, convertendo inteiros isolados (*Code Points*) usando a função `chr()` e injetando na função de substituição literal e otimizada `.replace()` do Python.
 * **Comportamento do `intern()`:** O JDK suporta um *String Pool* global gerido nativamente pela memória JVM. Para replicar este conceito no Python, utilizámos a função nativa `sys.intern()`. Esta função regista a `str` do Python no pool interno da memória do interpretador CPython. A instância exterior da `JString` devolvida permanece nova para garantir a imutabilidade do encapsulador, mas a sua referência interna de texto partilha a memória com o cache global.
 * **Otimização no `concat`:** Assim como a classe Java original, o nosso método verifica o comprimento da string adicionada. Se estiver a tentar concatenar uma string vazia, o método quebra o processo de inicialização de novas instâncias e devolve `self` (a própria instância em memória).
+
+---
+
+## 15. Expressões Regulares (JString)
+* **Paridade de Comportamento em `matches`:** No ecossistema Java, o método `matches()` tenta sempre casar a expressão regular com a **string inteira**. Para evitar falsos positivos (onde um trecho casaria, mas não o texto completo), usou-se a função nativa `re.fullmatch()` do CPython em vez de `re.search()` ou `re.match()`.
+* **Motor Estrito de `split` por `limit`:** O comportamento do `limit` do Java em `split` é complexo e distinto do `maxsplit` do Python. 
+    * Quando `limit > 0`: Mapeado para `maxsplit = limit - 1`.
+    * Quando `limit == 0`: A especificação Java determina o descarte das instâncias vazias à direita do array resultante. Como o Python não remove entradas vazias passivamente, implementou-se um algoritmo *pop* em cauda (`while res and not res[-1]: res.pop()`) para forçar o descarte das extremidades nulas e espelhar o comportamento do JDK à risca.

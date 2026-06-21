@@ -298,3 +298,41 @@ def test_jstring_intern():
     # Garante que as strings internas são a mesma referência no pool do Python
     assert sys.intern("test_pool") is s2.value
 
+def test_jstring_matches():
+    s = JString("12345")
+
+    # matches() do Java requer correspondência total
+    assert s.matches(r"\d+")
+
+    # Em Python, re.search ou re.match dariam True, mas em Java dá False
+    # pois a regex não cobre a string inteira
+    assert not JString("123a").matches(r"\d+")
+
+def test_jstring_replace_regex():
+    s = JString("aabbaa")
+
+    # replaceFirst: substitui apenas a primeira ocorrência
+    assert s.replaceFirst("a+", "X").value == "Xbbaa"
+
+    # replaceAll: substitui todas as ocorrências
+    assert s.replaceAll("a+", "X").value == "XbbX"
+
+def test_jstring_split_limit():
+    # Exemplo clássico da documentação oficial do Java: "boo:and:foo" com regex "o"
+    s = JString("boo:and:foo")
+
+    # Limit > 0 (Limit 2: tamanho máximo do array será 2)
+    res_limit_2 = s.split("o", 2)
+    assert res_limit_2 == ["b", "o:and:foo"]
+
+    # Limit < 0 (Aplica infinitas vezes e mantém as strings vazias no final)
+    res_limit_neg = s.split("o", -2)
+    assert res_limit_neg == ["b", "", ":and:f", "", ""]
+
+    # Limit == 0 (Aplica infinitas vezes, mas descarta strings vazias no final)
+    res_limit_0 = s.split("o", 0)
+    assert res_limit_0 == ["b", "", ":and:f"]
+
+    # Teste de sobrecarga (split sem parâmetro assume limit=0)
+    res_default = s.split("o")
+    assert res_default == ["b", "", ":and:f"]

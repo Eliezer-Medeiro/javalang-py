@@ -3,6 +3,7 @@ from typing import List, Union, Optional, Any
 
 
 class JString:
+    #CONSTRUTORES
     def __init__(
         self,
         value: Optional[
@@ -11,7 +12,7 @@ class JString:
         arg2: Optional[Union[int, str]] = None,
         arg3: Optional[int] = None,
     ):
-        """Construtores unificados para paridade com java.lang.String (Java SE 8)."""
+        """Construtores"""
         # 1. String()
         if value is None:
             self.value = ""
@@ -99,6 +100,7 @@ class JString:
     def __repr__(self) -> str:
         return f"JString('{self.value}')"
 
+    #ACESSO E TAMANHO
     def length(self) -> int:
         """Retorna o comprimento da string."""
         return len(self.value)
@@ -189,6 +191,7 @@ class JString:
         # Modifica a lista destino in-place
         dst[dstBegin : dstBegin + length] = chars_to_copy
 
+    #COMPARAÇÃO
     def equals(self, anObject: Any) -> bool:
         """Compara esta string com o objeto especificado."""
         return self == anObject
@@ -283,6 +286,7 @@ class JString:
         """Dunder method para tornar JString 'hashable' em sets e dicts."""
         return self.hashCode()
 
+    #BUSCA
     def indexOf(
         self, ch_or_str: Union[int, str, 'JString'], fromIndex: int = 0
     ) -> int:
@@ -347,6 +351,7 @@ class JString:
         target = suffix.value if isinstance(suffix, JString) else str(suffix)
         return self.value.endswith(target)
 
+    # TRANSFORMAÇÃO
     def substring(
         self, beginIndex: int, endIndex: Optional[int] = None
     ) -> JString:
@@ -405,3 +410,49 @@ class JString:
         """Retorna a representacao canonica para o pool de strings."""
         import sys
         return JString(sys.intern(self.value))
+
+    # EXPRESSÕES REGULARES
+    def matches(self, regex: Union[str, 'JString']) -> bool:
+        """Indica se esta string corresponde totalmente a expressao regular."""
+        import re
+        pattern = regex.value if isinstance(regex, JString) else str(regex)
+        # O Java matches() exige que a string INTEIRA corresponda à regex
+        return bool(re.fullmatch(pattern, self.value))
+
+    def replaceFirst(
+        self, regex: Union[str, 'JString'], replacement: Union[str, 'JString']
+    ) -> JString:
+        """Substitui a primeira substring que corresponde a expressao regular."""
+        import re
+        pattern = regex.value if isinstance(regex, JString) else str(regex)
+        repl = (
+            replacement.value
+            if isinstance(replacement, JString) else str(replacement)
+        )
+        return JString(re.sub(pattern, repl, self.value, count=1))
+
+    def replaceAll(
+        self, regex: Union[str, 'JString'], replacement: Union[str, 'JString']
+    ) -> JString:
+        """Substitui todas as substrings que correspondem a expressao regular."""
+        import re
+        pattern = regex.value if isinstance(regex, JString) else str(regex)
+        repl = (
+            replacement.value
+            if isinstance(replacement, JString) else str(replacement)
+        )
+        return JString(re.sub(pattern, repl, self.value))
+
+    def split(self, regex: Union[str, 'JString'], limit: int = 0) -> List[str]:
+        """Divide esta string em torno das correspondencias da expressao regular."""
+        import re
+        pattern = regex.value if isinstance(regex, JString) else str(regex)
+
+        if limit > 0:
+            res = re.split(pattern, self.value, maxsplit=limit - 1)
+        else:
+            res = re.split(pattern, self.value)
+            if limit == 0:
+                while res and not res[-1]:
+                    res.pop()
+        return res
