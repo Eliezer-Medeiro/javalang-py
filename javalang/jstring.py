@@ -188,3 +188,97 @@ class JString:
 
         # Modifica a lista destino in-place
         dst[dstBegin : dstBegin + length] = chars_to_copy
+
+    def equals(self, anObject: Any) -> bool:
+        """Compara esta string com o objeto especificado."""
+        return self == anObject
+
+    def __eq__(self, other: Any) -> bool:
+        """Dunder method para suportar o operador == do Python nativamente."""
+        if isinstance(other, JString):
+            return self.value == other.value
+        return False
+
+    def equalsIgnoreCase(self, anotherString: Union[str, 'JString']) -> bool:
+        """Compara esta string com outra, ignorando consideracoes de caixa."""
+        if isinstance(anotherString, JString):
+            other_val = anotherString.value
+        else:
+            other_val = str(anotherString)
+        return self.value.lower() == other_val.lower()
+
+    def compareTo(self, anotherString: 'JString') -> int:
+        """Compara duas strings lexicograficamente."""
+        if not isinstance(anotherString, JString):
+            raise TypeError("compareTo exige um objeto JString")
+
+        len1, len2 = len(self.value), len(anotherString.value)
+        lim = min(len1, len2)
+
+        for k in range(lim):
+            c1, c2 = self.value[k], anotherString.value[k]
+            if c1 != c2:
+                return ord(c1) - ord(c2)
+        return len1 - len2
+
+    def compareToIgnoreCase(self, anotherString: 'JString') -> int:
+        """Compara duas strings lexicograficamente, ignorando caixa."""
+        if not isinstance(anotherString, JString):
+            raise TypeError("compareToIgnoreCase exige um objeto JString")
+
+        # Cria cópias temporárias em minúsculas e aplica a mesma lógica
+        temp_self = JString(self.value.lower())
+        temp_other = JString(anotherString.value.lower())
+        return temp_self.compareTo(temp_other)
+
+    def contentEquals(self, cs: Any) -> bool:
+        """Compara esta string a um CharSequence (ex: StringBuilder, str)."""
+        if isinstance(cs, JString):
+            return self.value == cs.value
+        if isinstance(cs, str):
+            return self.value == cs
+        if hasattr(cs, "toString"):
+            return self.value == cs.toString()
+        return False
+
+    def regionMatches(
+        self, arg1: Any, arg2: Any, arg3: Any, arg4: Any, arg5: Any = None
+    ) -> bool:
+        """Testa se duas regioes de string sao iguais, lidando com sobrecarga."""
+        if arg5 is None:
+            # Assinatura: regionMatches(toffset, other, ooffset, len)
+            ignoreCase, toffset, other, ooffset, length = False, arg1, arg2, arg3, arg4
+        else:
+            # Assinatura: regionMatches(ignoreCase, toffset, other, ooffset, len)
+            ignoreCase, toffset, other, ooffset, length = arg1, arg2, arg3, arg4, arg5
+
+        other_str = other.value if isinstance(other, JString) else str(other)
+
+        # Validações de limites impostas pelo Java (Quebradas para o Ruff)
+        if (
+            toffset < 0
+            or ooffset < 0
+            or toffset + length > len(self.value)
+            or ooffset + length > len(other_str)
+        ):
+            return False
+
+        s1 = self.value[toffset : toffset + length]
+        s2 = other_str[ooffset : ooffset + length]
+
+        if ignoreCase:
+            return s1.lower() == s2.lower()
+        return s1 == s2
+
+    def hashCode(self) -> int:
+        """Retorna o codigo hash (formula exata do Java com overflow de 32 bits)."""
+        h = 0
+        for char in self.value:
+            # h = 31 * h + char, mascarado para 32 bits sem sinal
+            h = (31 * h + ord(char)) & 0xFFFFFFFF
+        # Converte para int de 32 bits com sinal
+        return h if h < 0x80000000 else h - 0x100000000
+
+    def __hash__(self) -> int:
+        """Dunder method para tornar JString 'hashable' em sets e dicts."""
+        return self.hashCode()
