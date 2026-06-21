@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List, Union, Optional, Any
 
-from numpy import iterable
+from collections.abc import Iterable
 
 
 class JString:
@@ -476,7 +476,7 @@ class JString:
         return JString.valueOf(data)
 
     @staticmethod
-    def join(delimiter: Any, elements: iterable) -> 'JString':
+    def join(delimiter: Any, elements: Iterable) -> 'JString':
         """Concatena os elementos utilizando o delimitador fornecido."""
         delim_str = delimiter.value if hasattr(delimiter, 'value') else str(delimiter)
         raw_elements = [e.value if hasattr(e, 'value') else str(e) for e in elements]
@@ -488,3 +488,4 @@ class JString:
         fmt_str = fmt.value if hasattr(fmt, 'value') else str(fmt)
         raw_args = tuple(a.value if hasattr(a, 'value') else a for a in args)
         return JString(fmt_str % raw_args)
+
