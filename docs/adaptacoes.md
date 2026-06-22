@@ -125,4 +125,5 @@ Este documento regista formalmente as decisões de engenharia de software adotad
 * **Motor Estrito de `split` por `limit`:** O comportamento do `limit` do Java em `split` é complexo e distinto do `maxsplit` do Python. 
     * Quando `limit > 0`: Mapeado para `maxsplit = limit - 1`.
     * Quando `limit == 0`: A especificação Java determina o descarte das instâncias vazias à direita do array resultante. Como o Python não remove entradas vazias passivamente, implementou-se um algoritmo *pop* em cauda (`while res and not res[-1]: res.pop()`) para forçar o descarte das extremidades nulas e espelhar o comportamento do JDK à risca.
+Texto modificado pela Branch A
 Texto modificado pela Branch B
