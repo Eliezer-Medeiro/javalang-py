@@ -51,7 +51,7 @@ class JString:
                 sub_list = value
 
             if all(isinstance(x, int) for x in sub_list):
-                self.value = "".join(chr(cp) for cp in sub_list)
+                self.value = "".join(chr(cp) for cp in sub_list) # type: ignore[arg-type]
             else:
                 self.value = "".join(str(ch) for ch in sub_list)
             return
