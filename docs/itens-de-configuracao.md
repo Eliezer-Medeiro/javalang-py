@@ -12,4 +12,8 @@ Este documento identifica e estabelece o controle sobre os ativos de software cr
 | **IC-06** | Diretrizes de Arquitetura (`adr/`) | Gerente de Config. | Texto (.md) | Baixa (Apenas decisões) | Nenhuma |
 | **IC-07** | Matriz de Adaptações (`adaptacoes.md`)| Gerente de Config. | Texto (.md) | Média (A cada desvio) | Especificação Java SE 8 |
 | **IC-08** | Relatórios de Status (`relatorios/`) | Relator | Texto (.md) | Por Baseline alcançada | Progresso dos Sprints |
+<<<<<<< HEAD
 IC controlado pela Branch B
+=======
+IC controlado pela Branch A
+>>>>>>> branch-a
