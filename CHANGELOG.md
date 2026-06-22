@@ -26,3 +26,4 @@ Todas as alterações notáveis neste projeto serão documentadas neste ficheiro
 ### Added
 - Setup inicial do repositório, configuração do CI com Ruff e proteção da branch `main`.
 - Documentação inicial: Itens de Configuração e ADRs 0001, 0002 e 0003.
+
