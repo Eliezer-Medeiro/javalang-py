@@ -1,0 +1,1 @@
+Notas da versão por Branch A
